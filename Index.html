@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinguaFlow AI - German Language Learning</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* RESET */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* HERO SECTION */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+        }
+        
+        .logo {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #00d4ff, #ff6b9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .tagline {
+            font-size: 1.5rem;
+            color: #b0b0b0;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+        
+        /* FEATURES */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: #00d4ff;
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #00d4ff;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        
+        /* BUTTONS */
+        .btn {
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* CHAT DEMO */
+        .chat-demo {
+            max-width: 600px;
+            margin: 40px auto;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .message {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            animation: fadeIn 0.5s;
+        }
+        
+        .message-ai {
+            justify-content: flex-start;
+        }
+        
+        .message-user {
+            justify-content: flex-end;
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 15px;
+            border-radius: 15px;
+        }
+        
+        .message-ai .message-content {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        .message-user .message-content {
+            background: rgba(255, 107, 157, 0.1);
+            border: 1px solid rgba(255, 107, 157, 0.3);
+        }
+        
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 40px;
+        }
+        
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .logo { font-size: 2rem; }
+            .tagline { font-size: 1.2rem; }
+            .features { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="logo">
+            <i class="fas fa-comment-dots"></i> LinguaFlow AI
+        </div>
+        
+        <h1 class="tagline">
+            Learn German with Hyper-Realistic AI Conversations
+        </h1>
+        
+        <div style="margin: 30px 0;">
+            <button class="btn btn-primary" onclick="startDemo()">
+                <i class="fas fa-play"></i> Try Demo
+            </button>
+            <button class="btn btn-secondary" onclick="scrollToFeatures()">
+                <i class="fas fa-info-circle"></i> Learn More
+            </button>
+        </div>
+        
+        <!-- STATUS INDICATOR -->
+        <div id="status" style="margin-top: 20px; padding: 10px 20px; border-radius: 20px; background: rgba(0,0,0,0.3);">
+            <i class="fas fa-circle" style="color: #00ff9d; margin-right: 10px;"></i>
+            <span>System Ready</span>
+        </div>
+    </section>
+    
+    <!-- FEATURES -->
+    <section id="features" style="padding: 40px 20px;">
+        <h2 style="text-align: center; margin-bottom: 40px; font-size: 2.5rem;">
+            Why Choose LinguaFlow?
+        </h2>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <h3 class="feature-title">3D Video Call Experience</h3>
+                <p>Realistic avatars that make you feel like you're talking to a real person</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="feature-title">AI-Powered Coaching</h3>
+                <p>Instant feedback on pronunciation, grammar, and vocabulary</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-microphone"></i>
+                </div>
+                <h3 class="feature-title">Voice Recognition</h3>
+                <p>Practice speaking with accurate speech-to-text analysis</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CHAT DEMO -->
+    <section style="padding: 40px 20px;">
+        <h2 style="text-align: center; margin-bottom: 30px;">
+            Try Our AI Chat Demo
+        </h2>
+        
+        <div class="chat-demo">
+            <div id="chatContainer">
+                <!-- Messages will appear here -->
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <input type="text" id="chatInput" placeholder="Type a message in German..." 
+                       style="flex: 1; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white;">
+                <button class="btn btn-primary" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px; color: #888; font-size: 0.9rem;">
+                <p>Example: Try saying "Hallo, wie geht es dir?" or "Ich lerne Deutsch"</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2024 LinguaFlow AI. All rights reserved.</p>
+        <p style="margin-top: 10px; font-size: 0.9rem;">
+            Made with <i class="fas fa-heart" style="color: #ff6b9d;"></i> for language learners
+        </p>
+    </footer>
+    
+    <script>
+        // Simple demo without backend dependency
+        const demoResponses = [
+            {
+                german: "Hallo! Wie geht es dir heute?",
+                english: "Hello! How are you today?"
+            },
+            {
+                german: "Das klingt interessant! Erzähl mir mehr.",
+                english: "That sounds interesting! Tell me more."
+            },
+            {
+                german: "Wie war dein Tag? Hast du etwas Neues gelernt?",
+                english: "How was your day? Did you learn something new?"
+            },
+            {
+                german: "Deutsch ist eine schöne Sprache, nicht wahr?",
+                english: "German is a beautiful language, isn't it?"
+            },
+            {
+                german: "Lass uns über deine Hobbys sprechen!",
+                english: "Let's talk about your hobbies!"
+            }
+        ];
+        
+        let messageCount = 0;
+        
+        function startDemo() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML = '';
+            
+            addMessage("Hallo! Ich bin Max, dein KI-Deutschlehrer. Lass uns plaudern!", 'ai');
+            
+            // Update status
+            document.getElementById('status').innerHTML = `
+                <i class="fas fa-circle" style="color: #00ff9d; margin-right: 10px;"></i>
+                <span>Demo Active - AI Ready</span>
+            `;
+        }
+        
+        function addMessage(text, sender) {
+            const chatContainer = document.getElementById('chatContainer');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message message-${sender}`;
+            
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <strong>${sender === 'ai' ? 'Max (AI)' : 'You'}</strong>
+                        <small style="color: #888;">${time}</small>
+                    </div>
+                    <div>${text}</div>
+                </div>
+            `;
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.id = 'typing';
+            typingIndicator.className = 'message message-ai';
+            typingIndicator.innerHTML = `
+                <div class="message-content">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('chatContainer').appendChild(typingIndicator);
+            document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
+            
+            // Add typing animation
+            const style = document.createElement('style');
+            style.innerHTML = `
+                .typing-dot {
+                    width: 8px;
+                    height: 8px;
+                    background: #00d4ff;
+                    border-radius: 50%;
+                    animation: typing 1.4s infinite;
+                }
+                .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+                .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+                @keyframes typing {
+                    0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+                    30% { transform: translateY(-10px); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Simulate AI response after delay
+            setTimeout(() => {
+                document.getElementById('typing').remove();
+                
+                // Get random response
+                const response = demoResponses[Math.floor(Math.random() * demoResponses.length)];
+                
+                // Add AI response
+                addMessage(`${response.german}<br><small style="color: #888; font-style: italic;">${response.english}</small>`, 'ai');
+                
+                messageCount++;
+                
+                // Update status
+                if (messageCount === 3) {
+                    document.getElementById('status').innerHTML = `
+                        <i class="fas fa-circle" style="color: #00d4ff; margin-right: 10px;"></i>
+                        <span>Great! You're getting the hang of it!</span>
+                    `;
+                }
+            }, 1500);
+        }
+        
+        function scrollToFeatures() {
+            document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Auto-start demo
+        window.onload = function() {
+            setTimeout(startDemo, 1000);
+            
+            // Allow enter key to send message
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        };
+        
+        // Voice recognition demo (optional)
+        function startVoice() {
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'de-DE';
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('chatInput').value = transcript;
+                    sendMessage();
+                };
+                recognition.start();
+            } else {
+                alert('Voice recognition not supported in this browser');
+            }
+        }
+        
+        // Add voice button to input
+        document.getElementById('chatInput').insertAdjacentHTML('afterend', `
+            <button onclick="startVoice()" style="
+                background: rgba(255,255,255,0.1);
+                border: 1px solid rgba(255,255,255,0.2);
+                color: white;
+                width: 50px;
+                border-radius: 10px;
+                cursor: pointer;
+            ">
+                <i class="fas fa-microphone"></i>
+            </button>
+        `);
+    </script>
+</body>
+</html>
