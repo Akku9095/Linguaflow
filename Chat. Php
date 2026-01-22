@@ -1,0 +1,211 @@
+<?php
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+// Hugging Face API Token (Spck में Environment Variables का option नहीं है)
+// इसलिए यहाँ direct डालें, लेकिन production में नहीं
+$HF_TOKEN = "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";
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    
+    $message = $data['message'] ?? '';
+    $avatar = $data['avatar'] ?? 'max';
+    $mode = $data['mode'] ?? 'daily';
+    $userId = $data['userId'] ?? 'guest';
+    
+    // Rate limiting (simple)
+    session_start();
+    if (!isset($_SESSION['request_count'])) {
+        $_SESSION['request_count'] = 0;
+        $_SESSION['first_request'] = time();
+    }
+    
+    $_SESSION['request_count']++;
+    
+    if (time() - $_SESSION['first_request'] > 60) {
+        $_SESSION['request_count'] = 1;
+        $_SESSION['first_request'] = time();
+    }
+    
+    if ($_SESSION['request_count'] > 60) {
+        echo json_encode([
+            'error' => 'Rate limit exceeded. Please try again later.'
+        ]);
+        exit;
+    }
+    
+    // Build prompt based on avatar and mode
+    $prompt = buildPrompt($message, $avatar, $mode);
+    
+    // Call Hugging Face API
+    $response = callHuggingFaceAPI($prompt, $HF_TOKEN);
+    
+    // Format response
+    $formattedResponse = formatResponse($response, $avatar);
+    
+    // Log conversation (optional)
+    logConversation($userId, $message, $formattedResponse);
+    
+    echo json_encode($formattedResponse);
+}
+
+function buildPrompt($message, $avatar, $mode) {
+    $avatars = [
+        'max' => "You are Max, a friendly German language partner from Berlin. You're enthusiastic and encouraging.",
+        'anna' => "You are Anna, a patient German tutor from Munich. You're supportive and clear in explanations.",
+        'leo' => "You are Leo, a professional business German coach. You're formal but approachable.",
+        'sofia' => "You are Sofia, a German exam preparation specialist. You're focused and educational."
+    ];
+    
+    $modes = [
+        'daily' => "Engage in everyday conversation about daily life, hobbies, travel, and casual topics.",
+        'business' => "Simulate professional business scenarios: meetings, emails, presentations, negotiations.",
+        'exam' => "Prepare for German language exams (Goethe, TestDaF). Include exam-style questions."
+    ];
+    
+    $avatarPrompt = $avatars[$avatar] ?? $avatars['max'];
+    $modePrompt = $modes[$mode] ?? $modes['daily'];
+    
+    return "{$avatarPrompt} {$modePrompt}
+
+IMPORTANT: Always respond in this format:
+German: [Your response in natural German]
+English: [Translation in English]
+Vocabulary: [3-5 new German words from your response]
+
+User: {$message}
+AI:";
+}
+
+function callHuggingFaceAPI($prompt, $token) {
+    // Using a model that's good for conversation
+    $model = "microsoft/DialoGPT-medium";
+    
+    $url = "https://api-inference.huggingface.co/models/{$model}";
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        'inputs' => $prompt,
+        'parameters' => [
+            'max_length' => 200,
+            'temperature' => 0.7,
+            'top_p' => 0.9,
+            'repetition_penalty' => 1.1
+        ],
+        'options' => [
+            'use_cache' => true,
+            'wait_for_model' => true
+        ]
+    ]));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $token,
+        'Content-Type: application/json'
+    ]);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode !== 200) {
+        // Fallback to mock response
+        return getMockResponse();
+    }
+    
+    return json_decode($response, true);
+}
+
+function formatResponse($apiResponse, $avatar) {
+    // Extract generated text
+    $generatedText = $apiResponse[0]['generated_text'] ?? '';
+    
+    // Parse the format: German: ... English: ... Vocabulary: ...
+    $german = extractBetween($generatedText, 'German:', 'English:') ?: 
+               extractBetween($generatedText, 'German:', 'Vocabulary:') ?: 
+               $generatedText;
+    
+    $english = extractBetween($generatedText, 'English:', 'Vocabulary:') ?: 
+                extractBetween($generatedText, 'English:', 'German:') ?:
+                "Translation not available";
+    
+    $vocabulary = extractBetween($generatedText, 'Vocabulary:', "\n") ?: 
+                  extractBetween($generatedText, 'Vocabulary:', 'User:') ?:
+                  "";
+    
+    return [
+        'german' => trim($german),
+        'english' => trim($english),
+        'vocabulary' => array_filter(array_map('trim', explode(',', $vocabulary))),
+        'avatar' => $avatar,
+        'timestamp' => date('Y-m-d H:i:s'),
+        'pronunciationTip' => getPronunciationTip()
+    ];
+}
+
+function extractBetween($text, $start, $end) {
+    $startPos = stripos($text, $start);
+    if ($startPos === false) return null;
+    
+    $startPos += strlen($start);
+    $endPos = stripos($text, $end, $startPos);
+    
+    if ($endPos === false) {
+        return substr($text, $startPos);
+    }
+    
+    return substr($text, $startPos, $endPos - $startPos);
+}
+
+function getPronunciationTip() {
+    $tips = [
+        "Focus on vowel sounds - they're pure in German",
+        "Remember to pronounce final consonants",
+        "Practice the 'ch' sound - it's unique to German",
+        "Work on umlauts: ä, ö, ü",
+        "Pay attention to word stress patterns"
+    ];
+    
+    return $tips[array_rand($tips)];
+}
+
+function getMockResponse() {
+    $responses = [
+        [
+            'german' => "Hallo! Das ist eine tolle Unterhaltung. Lass uns weiter sprechen!",
+            'english' => "Hello! This is a great conversation. Let's continue talking!",
+            'vocabulary' => ["Unterhaltung", "sprechen", "tolle"],
+            'pronunciationTip' => "Focus on clear articulation"
+        ],
+        [
+            'german' => "Sehr interessant! Was denkst du darüber?",
+            'english' => "Very interesting! What do you think about that?",
+            'vocabulary' => ["interessant", "denken", "darüber"],
+            'pronunciationTip' => "Practice the 'r' sound"
+        ]
+    ];
+    
+    return $responses[array_rand($responses)];
+}
+
+function logConversation($userId, $userMessage, $aiResponse) {
+    // Simple file-based logging
+    $logFile = 'conversations.log';
+    $logEntry = json_encode([
+        'timestamp' => date('Y-m-d H:i:s'),
+        'userId' => $userId,
+        'userMessage' => $userMessage,
+        'aiResponse' => $aiResponse
+    ]) . "\n";
+    
+    file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
+}
+?>
